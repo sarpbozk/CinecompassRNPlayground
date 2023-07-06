@@ -1,1 +1,1 @@
-![ezgif com-video-to-gif](https://github.com/mubozk/CinecompassRNPlayground/assets/62714901/0faaaf8c-aa7e-4e52-a238-cf1e15f96208)
+![ezgif com-video-to-gif](https://github.com/mubozk/CinecompassRNPlayground/assets/62714901/c0f99480-3c3a-4f7a-8263-d7a314044bfb)
