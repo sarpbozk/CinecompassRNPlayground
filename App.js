@@ -1,54 +1,77 @@
-import React from 'react';
+import React, { useReducer } from 'react';
 import { View, Text, StyleSheet, Button, TextInput } from 'react-native';
 
+const initialState = {
+  movieName: '',
+  movies: [],
+  loading: false,
+};
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'SET_MOVIE_NAME':
+      return { ...state, movieName: action.payload };
+    case 'SET_MOVIES':
+      return { ...state, movies: action.payload };
+    case 'SET_LOADING':
+      return { ...state, loading: action.payload };
+    default:
+      return state;
+  }
+};
+
 const ExampleScreen = () => {
-  const [movieName, setMovieName] = React.useState('');
-  const [movies, setMovies] = React.useState([]);
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   const handleButtonPress = async () => {
     try {
-      const encodedMovieName = encodeURIComponent(movieName);
+      dispatch({ type: 'SET_LOADING', payload: true }); // Start loading
+
+      const encodedMovieName = encodeURIComponent(state.movieName);
       const apiKey = '87027965472f4df58ab7f4cfb6212185';
       const searchURL = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${encodedMovieName}`;
-      
+
+      // simulated delay for better view of loading state 
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
       const response = await fetch(searchURL);
       const data = await response.json();
 
       if (response.ok) {
-        const parsedMovies = parseMovieData(data);
-        setMovies(parsedMovies);
+        dispatch({ type: 'SET_MOVIES', payload: data.results }); // Set movies
       } else {
         console.error('Error:', data);
       }
     } catch (error) {
       console.error('Error:', error);
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false }); // Stop loading
     }
-  };
-
-  const parseMovieData = (data) => {
-    if (data && data.results) {
-      return data.results;
-    }
-    return [];
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Search Movies</Text>
+      <Text style={styles.header}>Welcome to React Native!</Text>
       <View style={styles.content}>
-        <Text>This is a dummy app to test imdb search functionality</Text>
-        <Text>You can search for moviesby pressing "search" button</Text>
+        <Text>This is an example screen.</Text>
+        <Text>You can add your content here.</Text>
         <TextInput
           style={styles.input}
           placeholder="Enter a movie name"
-          value={movieName}
-          onChangeText={setMovieName}
+          value={state.movieName}
+          onChangeText={(text) => dispatch({ type: 'SET_MOVIE_NAME', payload: text })}
         />
         <Button title="Search" onPress={handleButtonPress} />
-        <Text>Search Results:</Text>
-        {movies.map((movie) => (
-          <Text key={movie.id}>{movie.title}</Text>
-        ))}
+        {state.loading ? (
+          <Text>Searching...</Text> // Display "Searching..." when loading is true
+        ) : (
+          <>
+            <Text>Search Results:</Text>
+            {state.movies.map((movie) => (
+              <Text key={movie.id}>{movie.title}</Text>
+            ))}
+          </>
+        )}
       </View>
     </View>
   );
